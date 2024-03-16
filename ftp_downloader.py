@@ -30,11 +30,19 @@ def download_from_ftp(host, username, password, local_folder):
                 continue
             valid_file_name = file.replace('<', '').replace('>', '').replace(':', '').replace('"', '').replace('/', '').replace('\\', '').replace('|', '').replace('?', '').replace('*', '')
             local_file = os.path.join(host_folder, valid_file_name)
-            with open(local_file, "wb") as fileu:
-                ftp.retrbinary(f"RETR {file}", fileu.write)
-                ftp.delete(file)
-            print(f'Downloaded locally and removed from host: {file}')
-            time.sleep(1)
+
+            # Get the size of the file
+            file_size = ftp.size(file)
+
+            # Check if the file size is greater than 0 before downloading
+            if file_size > 0:
+                with open(local_file, "wb") as fileu:
+                    ftp.retrbinary(f"RETR {file}", fileu.write)
+                    ftp.delete(file)
+                print(f'Downloaded locally and removed from host: {file}')
+                time.sleep(1)
+            else:
+                print(f'Skipping download of 0KB file: {file}')
 
         # Close FTP connection
         ftp.quit()
