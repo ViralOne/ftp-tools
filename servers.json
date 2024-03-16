@@ -1,0 +1,4 @@
+[
+    {"host": "ftp.example.com", "username": "username1", "password": "password1"},
+    {"host": "ftp.example.net", "username": "username2", "password": "password2"}
+]
