@@ -2,6 +2,7 @@ import os
 import json
 import time
 import socket
+import argparse
 from concurrent.futures import ThreadPoolExecutor
 from ftplib import FTP
 from urllib.parse import quote
@@ -18,6 +19,12 @@ def is_host_reachable(host):
         return True
     except socket.error:
         return False
+    
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='FTP File Downloader')
+    parser.add_argument('file_path', default='servers.json', type=str, help='Path to the JSON file containing FTP server details')
+    parser.add_argument('-d', '--download-folder', type=str, default='downloads', help='Local folder to save downloaded files (default: downloads)')
+    return parser.parse_args()
 
 def download_from_ftp(host, username, password, local_folder):
     if not is_host_reachable(host):
@@ -54,8 +61,9 @@ def download_from_ftp(host, username, password, local_folder):
         print(f"Error: {e}")
 
 def main():
-    ftp_servers = load_ftp_servers("servers.json")
-    local_folder = "downloads"
+    args = parse_arguments()
+    ftp_servers = load_ftp_servers(args.file_path)
+    local_folder = args.download_folder
 
     with ThreadPoolExecutor() as executor:
         for server in ftp_servers:
