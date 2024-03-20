@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import socket
 from concurrent.futures import ThreadPoolExecutor
 from ftplib import FTP
 from urllib.parse import quote
@@ -11,7 +12,18 @@ def load_ftp_servers(file_path):
         ftp_servers = json.load(file)
     return ftp_servers
 
+def is_host_reachable(host):
+    try:
+        socket.gethostbyname(host)
+        return True
+    except socket.error:
+        return False
+
 def download_from_ftp(host, username, password, local_folder):
+    if not is_host_reachable(host):
+        print(f"Host {host} is unreachable. Skipping download.")
+        return
+    
     try:
         with FTP(host) as ftp:
             print(f"Connected to {host}")
@@ -36,7 +48,8 @@ def download_from_ftp(host, username, password, local_folder):
                     print(f'Downloaded locally and removed from host: {file}')
                     time.sleep(1)
                 else:
-                    print(f'Skipping download of 0KB file: {file}')
+                    ftp.delete(file)
+                    print(f'Removing 0KB file: {file}')
     except Exception as e:
         print(f"Error: {e}")
 
