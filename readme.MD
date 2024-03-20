@@ -14,8 +14,8 @@ This script is designed to download files from multiple FTP servers concurrently
 1. Clone the repository or download the script directly.
 2. Ensure Python 3.x is installed on your system.
 3. Modify the `servers.json` file to include the FTP server details you want to connect to.
-4. Run the script using the command `python ftp_downloader.py`.
-5. Optionally, set `periodic_download` to `True` and specify the `interval_minutes` for periodic downloads.
+4. Run the script using the command `python3 ftp_downloader.py`.
+5. Example of command with all the flags: `python3 ftp_downloader.py -d downloads -p -i 15 servers.json`
 
 ## Configuration
 

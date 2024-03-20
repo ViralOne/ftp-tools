@@ -19,34 +19,32 @@ def is_host_reachable(host):
         return True
     except socket.error:
         return False
-    
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='FTP File Downloader')
-    parser.add_argument('file_path', default='servers.json', type=str, help='Path to the JSON file containing FTP server details')
+    parser.add_argument('file_path', nargs='?', default='servers.json', type=str, help='Path to the JSON file containing FTP server details')
     parser.add_argument('-d', '--download-folder', type=str, default='downloads', help='Local folder to save downloaded files (default: downloads)')
+    parser.add_argument('-p', '--periodic', action='store_true', help='Enable periodic checking')
+    parser.add_argument('-i', '--interval', type=int, default=30, help='Interval in minutes for periodic download (default: 30)')
     return parser.parse_args()
 
 def download_from_ftp(host, username, password, local_folder):
     if not is_host_reachable(host):
         print(f"Host {host} is unreachable. Skipping download.")
         return
-    
+
     try:
         with FTP(host) as ftp:
             print(f"Connected to {host}")
             ftp.login(username, password)
-
-            host_folder = Path(local_folder) / host
-            host_folder.mkdir(parents=True, exist_ok=True)
-
             ftp.cwd('/')
-
             files = ftp.nlst()
             for file in files:
                 if file in (".ftpquota", ".", ".."):
                     continue
-                local_file = host_folder / quote(file)
-
+                local_file = Path(local_folder) / host / quote(file)
+                if not local_file.parent.exists():
+                    local_file.parent.mkdir(parents=True, exist_ok=True)
                 file_size = ftp.size(file)
                 if file_size > 0:
                     with open(local_file, "wb") as fileu:
@@ -66,8 +64,14 @@ def main():
     local_folder = args.download_folder
 
     with ThreadPoolExecutor() as executor:
-        for server in ftp_servers:
-            executor.submit(download_from_ftp, server["host"], server["username"], server["password"], local_folder)
+        if args.periodic:
+            while True:
+                for server in ftp_servers:
+                   executor.submit(download_from_ftp, server["host"], server["username"], server["password"], local_folder)
+                time.sleep(args.interval * 60)
+        else:
+            for server in ftp_servers:
+                executor.submit(download_from_ftp, server["host"], server["username"], server["password"], local_folder)
 
 if __name__ == "__main__":
     main()
