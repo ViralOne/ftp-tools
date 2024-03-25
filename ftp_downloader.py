@@ -44,7 +44,10 @@ def download_from_ftp(host, username, password, local_folder):
                 local_file = Path(local_folder) / host / quote(file)
                 if not local_file.parent.exists():
                     local_file.parent.mkdir(parents=True, exist_ok=True)
-                file_size = ftp.size(file)
+                try:
+                    file_size = ftp.size(file)
+                except:
+                    file_size = 0
                 if file_size > 0:
                     with open(local_file, "wb") as fileu:
                         ftp.retrbinary(f"RETR {file}", fileu.write)
