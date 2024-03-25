@@ -35,7 +35,6 @@ def download_from_ftp(host, username, password, local_folder):
 
     try:
         with FTP(host) as ftp:
-            print(f"Connected to {host}")
             ftp.login(username, password)
             ftp.cwd('/')
             files = ftp.nlst()
@@ -50,13 +49,13 @@ def download_from_ftp(host, username, password, local_folder):
                     with open(local_file, "wb") as fileu:
                         ftp.retrbinary(f"RETR {file}", fileu.write)
                         ftp.delete(file)
-                    print(f'Downloaded locally and removed from host: {file}')
+                    print(f'Downloaded locally and removed from {host}: {file}')
                     time.sleep(1)
                 else:
                     ftp.delete(file)
                     print(f'Removing 0KB file: {file}')
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Error: {e} - {host}")
 
 def main():
     args = parse_arguments()
