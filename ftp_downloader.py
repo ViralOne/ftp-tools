@@ -9,7 +9,7 @@ from urllib.parse import quote
 from pathlib import Path
 
 def load_ftp_servers(file_path):
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8', errors='replace') as file:
         ftp_servers = json.load(file)
     return ftp_servers
 
@@ -56,7 +56,7 @@ def download_from_ftp(host, username, password, local_folder):
                     time.sleep(1)
                 else:
                     ftp.delete(file)
-                    print(f'Removing 0KB file: {file}')
+                    print(f'Removed 0KB file: {file}')
     except Exception as e:
         print(f"Error: {e} - {host}")
 
