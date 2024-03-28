@@ -56,8 +56,9 @@ def download_from_ftp(host, username, password, local_folder):
                         if args.remove:
                             ftp.delete(file)
                             print(f'Downloaded locally and removed from {host}: {file}')
-                    print(f'Downloaded locally from {host}: {file}')
-                    time.sleep(1)
+                        else:
+                            print(f'Downloaded locally from {host}: {file}')
+                    time.sleep(5)
                 else:
                     if args.remove:
                         ftp.delete(file)
